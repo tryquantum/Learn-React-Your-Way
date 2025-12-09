@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import * as Input from './input';
 import { cn } from '@/utils/cn';
 import {
   RiFlashlightFill,
