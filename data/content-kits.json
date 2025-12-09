@@ -1,0 +1,136 @@
+{
+  "kits": [
+    {
+      "id": "fitness-coach-kit",
+      "name": "Fitness Coach Kit",
+      "description": "Complete content templates for fitness professionals and wellness coaches",
+      "niche": "fitness",
+      "tierLevel": "free",
+      "contents": [
+        "35+ Instagram post templates",
+        "10 email sequences",
+        "5 lead magnets",
+        "20 story templates",
+        "15 reel scripts"
+      ],
+      "metadata": {
+        "templateCount": 85,
+        "downloadCount": 1243,
+        "rating": 4.8,
+        "lastUpdated": "2024-12-01",
+        "updatedDaysAgo": 8,
+        "tags": ["fitness", "wellness", "coaching", "health"]
+      }
+    },
+    {
+      "id": "ecommerce-brand-kit",
+      "name": "E-commerce Brand Kit",
+      "description": "Sales-focused content for online stores and product businesses",
+      "niche": "ecommerce",
+      "tierLevel": "pro",
+      "contents": [
+        "40+ product post templates",
+        "12 sales email funnels",
+        "8 promotional campaigns",
+        "25 story templates",
+        "18 video ad scripts"
+      ],
+      "metadata": {
+        "templateCount": 103,
+        "downloadCount": 2891,
+        "rating": 4.9,
+        "lastUpdated": "2024-11-28",
+        "updatedDaysAgo": 11,
+        "tags": ["ecommerce", "sales", "products", "retail"]
+      }
+    },
+    {
+      "id": "saas-startup-kit",
+      "name": "SaaS Startup Kit",
+      "description": "Growth-focused content for software companies and tech startups",
+      "niche": "saas",
+      "tierLevel": "free",
+      "contents": [
+        "30+ feature announcement templates",
+        "15 onboarding email sequences",
+        "10 case study templates",
+        "20 LinkedIn post templates",
+        "12 webinar scripts"
+      ],
+      "metadata": {
+        "templateCount": 87,
+        "downloadCount": 1567,
+        "rating": 4.7,
+        "lastUpdated": "2024-12-05",
+        "updatedDaysAgo": 4,
+        "tags": ["saas", "tech", "software", "b2b"]
+      }
+    },
+    {
+      "id": "real-estate-agent-kit",
+      "name": "Real Estate Agent Kit",
+      "description": "Property listing and client engagement content for realtors",
+      "niche": "realestate",
+      "tierLevel": "pro",
+      "contents": [
+        "35+ listing templates",
+        "10 buyer/seller email sequences",
+        "15 market update templates",
+        "20 story templates",
+        "8 virtual tour scripts"
+      ],
+      "metadata": {
+        "templateCount": 88,
+        "downloadCount": 982,
+        "rating": 4.6,
+        "lastUpdated": "2024-11-20",
+        "updatedDaysAgo": 19,
+        "tags": ["realestate", "property", "listings", "agents"]
+      }
+    },
+    {
+      "id": "restaurant-food-kit",
+      "name": "Restaurant & Food Kit",
+      "description": "Appetizing content for restaurants, cafes, and food businesses",
+      "niche": "food",
+      "tierLevel": "free",
+      "contents": [
+        "40+ menu item templates",
+        "12 promotional campaign templates",
+        "10 email newsletters",
+        "25 story templates",
+        "15 TikTok video scripts"
+      ],
+      "metadata": {
+        "templateCount": 102,
+        "downloadCount": 2134,
+        "rating": 4.8,
+        "lastUpdated": "2024-12-03",
+        "updatedDaysAgo": 6,
+        "tags": ["food", "restaurant", "hospitality", "culinary"]
+      }
+    },
+    {
+      "id": "financial-advisor-kit",
+      "name": "Financial Advisor Kit",
+      "description": "Educational content for financial advisors and wealth managers",
+      "niche": "finance",
+      "tierLevel": "pro",
+      "contents": [
+        "30+ educational post templates",
+        "15 client onboarding emails",
+        "10 market insight templates",
+        "20 LinkedIn templates",
+        "12 webinar presentations"
+      ],
+      "metadata": {
+        "templateCount": 87,
+        "downloadCount": 1456,
+        "rating": 4.9,
+        "lastUpdated": "2024-11-25",
+        "updatedDaysAago": 14,
+        "tags": ["finance", "investing", "wealth", "advisory"]
+      }
+    }
+  ]
+}
