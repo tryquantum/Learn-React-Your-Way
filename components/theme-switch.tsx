@@ -6,7 +6,7 @@ import * as SegmentedControl from '@/components/ui/segmented-control';
 import { RiEqualizer3Fill, RiMoonLine, RiSunLine } from '@remixicon/react';
 
 export default function ThemeSwitch() {
-  const { theme, resolvedTheme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

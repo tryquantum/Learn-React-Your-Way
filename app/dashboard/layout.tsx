@@ -9,7 +9,6 @@ import {
   RiDashboardLine,
   RiFolderLine,
   RiSparklingLine,
-  RiCheckboxCircleLine,
   RiSettings3Line,
   RiMenuLine,
 } from '@remixicon/react';

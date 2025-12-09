@@ -1,11 +1,8 @@
 "use client";
 
 import { SignInPage } from "@/components/ui/sign-in";
-import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const router = useRouter();
-
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);

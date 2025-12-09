@@ -15,16 +15,11 @@ import { cn } from '@/utils/cn';
 import {
   RiSearchLine,
   RiAddCircleLine,
-  RiFolder2Line,
-  RiBookOpenLine,
   RiArrowDownSLine,
   RiArrowUpSLine,
   RiSideBarLine,
   RiCloseLine,
   RiMore2Line,
-  RiPushpinLine,
-  RiPencilLine,
-  RiDeleteBinLine,
   RiMoonLine,
   RiSettings2Line,
   RiTranslate,
@@ -91,7 +86,6 @@ export function AISidebar({
   const [recentExpanded, setRecentExpanded] = React.useState(true);
   const [yesterdayExpanded, setYesterdayExpanded] = React.useState(true);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
-  const [hintsDissmissed, setHintsDissmissed] = useLocalStorage('sidebar-hints-dismissed', false);
   const [isDarkMode, setIsDarkMode] = useLocalStorage('theme-dark-mode', true);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
   const sidebarRef = React.useRef<HTMLDivElement>(null);

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { RiFolder2Fill, RiSearchLine, RiFilter3Line } from '@remixicon/react';
+import { RiFolder2Fill, RiSearchLine } from '@remixicon/react';
 import { ProjectCard } from '@/components/ui/project-card';
 import * as InputNS from '@/components/ui/input';
 import contentKitsData from '@/data/content-kits.json';

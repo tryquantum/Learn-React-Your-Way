@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import * as Button from './button';
 import { cn } from '@/utils/cn';
 import {
   RiFileCopyLine,

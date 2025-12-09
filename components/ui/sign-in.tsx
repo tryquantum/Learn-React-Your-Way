@@ -7,7 +7,7 @@ import * as Input from "./input";
 import { Root as Checkbox } from "./checkbox";
 import { Root as Label, Asterisk as LabelAsterisk } from "./label";
 import { Root as SocialButton, Icon as SocialButtonIcon } from "./social-button";
-import { Root as LinkButton, Icon as LinkButtonIcon } from "./link-button";
+import { Root as LinkButton } from "./link-button";
 
 interface SignInPageProps {
   title?: string;
