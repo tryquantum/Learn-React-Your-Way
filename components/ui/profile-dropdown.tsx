@@ -54,7 +54,7 @@ export function ProfileDropdown({
             className
           )}
         >
-          <Avatar.Root size={40}>
+          <Avatar.Root size="40">
             {user.avatarUrl ? (
               <Avatar.Image src={user.avatarUrl} alt={user.name} />
             ) : (
@@ -92,7 +92,7 @@ export function ProfileDropdown({
       >
         {/* User Profile Header */}
         <div className="flex items-center gap-3 overflow-hidden rounded-[10px] bg-[color:var(--bg-white-0)] p-2 dark:bg-[color:var(--bg-strong-950)]">
-          <Avatar.Root size={40}>
+          <Avatar.Root size="40">
             {user.avatarUrl ? (
               <Avatar.Image src={user.avatarUrl} alt={user.name} />
             ) : (
