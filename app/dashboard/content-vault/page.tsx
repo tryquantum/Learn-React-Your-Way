@@ -29,7 +29,7 @@ export default function ContentVaultPage() {
   const [pinnedKits, setPinnedKits] = useState<string[]>([]);
   const [filterTier, setFilterTier] = useState<'all' | 'free' | 'pro'>('all');
 
-  const kits: ContentKit[] = contentKitsData.kits;
+  const kits = contentKitsData.kits as ContentKit[];
 
   // Filter and search logic
   const filteredKits = useMemo(() => {
