@@ -1,50 +1,64 @@
-"use client";
+'use client';
 
-import { SignInPage } from "@/components/ui/sign-in";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { AuthLayout } from '@/components/layouts/AuthLayout';
+import { SignInForm, SignInFormData } from '@/components/ui/sign-in-form';
+import { useAuth } from '@/contexts/AuthContext';
+import { mapErrorToMessage, isNetworkError } from '@/utils/auth-errors';
 
 export default function LoginPage() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const data = Object.fromEntries(formData.entries());
-    console.log("Sign Up submitted:", data);
-    alert("Sign Up Submitted! Check the console for form data.");
-  };
+  const router = useRouter();
+  const { login } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleAppleSignIn = () => {
-    console.log("Continue with Apple clicked");
-    alert("Continue with Apple clicked");
+  const handleSignIn = async (data: SignInFormData) => {
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      // Call login and get onboarding status
+      const { onboardingCompleted } = await login(data.email, data.password);
+      
+      // Redirect based on onboarding status
+      if (onboardingCompleted) {
+        router.push('/dashboard');
+      } else {
+        router.push('/onboarding/niche-selection');
+      }
+    } catch (err: any) {
+      // Map error to user-friendly message
+      let errorMessage = 'An error occurred. Please try again.';
+      
+      if (isNetworkError(err)) {
+        errorMessage = 'Network error. Please check your connection and try again.';
+      } else if (err?.message) {
+        errorMessage = mapErrorToMessage(err.message);
+      }
+      
+      setError(errorMessage);
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleSignIn = () => {
-    console.log("Continue with Google clicked");
-    alert("Continue with Google clicked");
+    // TODO: Implement Google OAuth
+    console.log('Google sign in clicked');
   };
 
-  const handleLinkedInSignIn = () => {
-    console.log("Continue with LinkedIn clicked");
-    alert("Continue with LinkedIn clicked");
-  };
-
-  const handleContactUs = () => {
-    alert("Contact Us clicked");
-  };
-
-  const handleLogin = () => {
-    // Navigate to login page or open login modal
-    alert("Navigate to Login page");
+  const handleClose = () => {
+    router.push('/');
   };
 
   return (
-    <SignInPage
-      title="Join Synergy Team"
-      description="Get started by submitting email address."
-      onSubmit={handleSubmit}
-      onAppleSignIn={handleAppleSignIn}
-      onGoogleSignIn={handleGoogleSignIn}
-      onLinkedInSignIn={handleLinkedInSignIn}
-      onContactUs={handleContactUs}
-      onLogin={handleLogin}
-    />
+    <AuthLayout onClose={handleClose}>
+      <SignInForm
+        onSubmit={handleSignIn}
+        onGoogleSignIn={handleGoogleSignIn}
+        error={error}
+        isLoading={isLoading}
+      />
+    </AuthLayout>
   );
 }

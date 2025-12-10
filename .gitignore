@@ -38,3 +38,21 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Xano backend files (DO NOT COMMIT TO GITHUB)
+.xano
+apis/
+tables/
+functions/
+addons/
+agents/
+tasks/
+AGENTS.md
+CLAUDE.md
+docs/
+middlewares/
+realtime/
+tools/
+
+.cursor
+.github

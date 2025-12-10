@@ -2,108 +2,75 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { SignUpPage, type SignUpFormData } from '@/components/ui/sign-up';
+import { AuthLayout } from '@/components/layouts/AuthLayout';
+import { MultiStepSignUpForm, SignUpFormData } from '@/components/ui/multi-step-sign-up';
+import { useNotification } from '@/hooks/use-notification';
+import { authService } from '@/lib/xano';
 
-type FieldKey = 'firstName' | 'lastName' | 'brandName' | 'email' | 'password';
-type FieldErrors = Partial<Record<FieldKey, string>>;
 
-export default function SignupPage() {
+export default function SignUpPage() {
   const router = useRouter();
-  const [errors, setErrors] = useState<FieldErrors>({});
-  const [banner, setBanner] = useState<string | null>(null);
-  const [bannerStatus, setBannerStatus] = useState<'success' | 'error' | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { notification } = useNotification();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (formData: SignUpFormData) => {
-    setBanner(null);
-    setErrors({});
-    
-    const baseUrl = process.env.NEXT_PUBLIC_XANO_BASE_URL ?? 'https://x8ki-letl-twmt.n7.xano.io/api:loRGSvYR';
-    setLoading(true);
-    
+  const handleSignUp = async (data: SignUpFormData) => {
+    setIsLoading(true);
+
     try {
-      const res = await fetch(`${baseUrl}/auth/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email.trim().toLowerCase(),
-          password: formData.password,
-          password_confirm: formData.passwordConfirm,
-          first_name: formData.firstName.trim(),
-          last_name: formData.lastName.trim(),
-          business_name: formData.brandName.trim(),
-          accept_terms: formData.acceptTerms,
-          marketing_emails: formData.marketingEmails,
-        }),
+      // Call Xano signup API
+      const response = await authService.signup(data);
+      
+      // Show success notification
+      notification({
+        status: 'success',
+        title: 'Account created successfully!',
+        description: response.message || 'Please check your email to verify your account.',
+        duration: 6000,
       });
       
-      const data = await res.json();
+      // Redirect to email verification page with email parameter
+      // Note: User is NOT logged in yet - they need to verify email first
+      router.push('/verify-email?email=' + encodeURIComponent(data.email));
       
-      if (!res.ok) {
-        setBanner(data?.message || 'Something went wrong. Please try again.');
-        setBannerStatus('error');
-        
-        if (res.status === 409) {
-          setErrors((prev) => ({ ...prev, email: 'This email is already registered' }));
-        }
-        
-        if (res.status === 400 && data?.message?.toLowerCase().includes('password')) {
-          setErrors((prev) => ({ ...prev, password: data.message }));
-        }
-        return;
-      }
+    } catch (err: any) {
+      console.error('Signup error:', err);
       
-      setBanner(data?.message || 'Signup successful. Please check your email to verify your account.');
-      setBannerStatus('success');
+      // XanoError already contains the error message from Xano
+      const errorMessage = err.message || 'Something went wrong. Please try again.';
       
-      setTimeout(() => {
-        router.push(`/verify-email?email=${encodeURIComponent(formData.email.trim())}`);
-      }, 800);
-    } catch {
-      setBanner('Network error. Please try again.');
-      setBannerStatus('error');
-    } finally {
-      setLoading(false);
+      // Show error notification using toast
+      notification({
+        status: 'error',
+        title: 'Sign up failed',
+        description: errorMessage,
+        duration: 6000,
+      });
+      
+      setIsLoading(false);
     }
   };
 
-  const handleAppleSignIn = () => {
-    console.log('Continue with Apple clicked');
-    alert('Continue with Apple clicked');
+  const handleGoogleSignUp = () => {
+    // TODO: Implement Google OAuth
+    notification({
+      status: 'information',
+      title: 'Coming soon',
+      description: 'Google sign up will be available soon!',
+      duration: 3000,
+    });
   };
 
-  const handleGoogleSignIn = () => {
-    console.log('Continue with Google clicked');
-    alert('Continue with Google clicked');
-  };
-
-  const handleLinkedInSignIn = () => {
-    console.log('Continue with LinkedIn clicked');
-    alert('Continue with LinkedIn clicked');
-  };
-
-  const handleContactUs = () => {
-    alert('Contact Us clicked');
-  };
-
-  const handleLogin = () => {
-    router.push('/login');
+  const handleClose = () => {
+    router.push('/');
   };
 
   return (
-    <SignUpPage
-      title="Join Growtiva"
-      description="Create your account and start growing your business."
-      onSubmit={handleSubmit}
-      onAppleSignIn={handleAppleSignIn}
-      onGoogleSignIn={handleGoogleSignIn}
-      onLinkedInSignIn={handleLinkedInSignIn}
-      onContactUs={handleContactUs}
-      onLogin={handleLogin}
-      loading={loading}
-      errors={errors}
-      banner={banner}
-      bannerStatus={bannerStatus}
-    />
+    <AuthLayout onClose={handleClose}>
+      <MultiStepSignUpForm
+        onSubmit={handleSignUp}
+        onGoogleSignUp={handleGoogleSignUp}
+        isLoading={isLoading}
+      />
+    </AuthLayout>
   );
 }

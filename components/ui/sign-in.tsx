@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { Headphones, UserPlus, X, Mail } from "lucide-react";
+import { Headphones, UserPlus, X, Mail, Lock } from "lucide-react";
 import { Root as Button, Icon as ButtonIcon } from "./button";
 import * as Input from "./input";
 import { Root as Checkbox } from "./checkbox";
 import { Root as Label, Asterisk as LabelAsterisk } from "./label";
 import { Root as SocialButton, Icon as SocialButtonIcon } from "./social-button";
 import { Root as LinkButton } from "./link-button";
+import * as Alert from "./alert";
+import { RiErrorWarningLine } from "@remixicon/react";
 
 interface SignInPageProps {
   title?: string;
@@ -19,6 +21,12 @@ interface SignInPageProps {
   onLinkedInSignIn?: () => void;
   onContactUs?: () => void;
   onLogin?: () => void;
+  error?: string | null;
+  isLoading?: boolean;
+  email?: string;
+  setEmail?: (email: string) => void;
+  password?: string;
+  setPassword?: (password: string) => void;
 }
 
 const AppleIcon = () => (
@@ -74,9 +82,22 @@ export const SignInPage: React.FC<SignInPageProps> = ({
   onLinkedInSignIn,
   onContactUs,
   onLogin,
+  error,
+  isLoading = false,
+  email: externalEmail,
+  setEmail: externalSetEmail,
+  password: externalPassword,
+  setPassword: externalSetPassword,
 }) => {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const [email, setEmail] = useState("");
+  const [internalEmail, setInternalEmail] = useState("");
+  const [internalPassword, setInternalPassword] = useState("");
+
+  // Use external state if provided, otherwise use internal state
+  const email = externalEmail !== undefined ? externalEmail : internalEmail;
+  const setEmail = externalSetEmail || setInternalEmail;
+  const password = externalPassword !== undefined ? externalPassword : internalPassword;
+  const setPassword = externalSetPassword || setInternalPassword;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -192,6 +213,14 @@ export const SignInPage: React.FC<SignInPageProps> = ({
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="w-full space-y-6">
+              {/* Error Alert */}
+              {error && (
+                <Alert.Root variant="light" status="error" size="small">
+                  <Alert.Icon as={RiErrorWarningLine} />
+                  <div>{error}</div>
+                </Alert.Root>
+              )}
+
               {/* Email Input */}
               <div className="space-y-2">
                 <Label htmlFor="email">
@@ -206,9 +235,36 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                     <Input.Input
                       id="email"
                       type="email"
+                      name="email"
                       placeholder="hello@alignui.com"
                       value={email}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                      disabled={isLoading}
+                      required
+                    />
+                  </Input.Wrapper>
+                </Input.Root>
+              </div>
+
+              {/* Password Input */}
+              <div className="space-y-2">
+                <Label htmlFor="password">
+                  Password
+                  <LabelAsterisk />
+                </Label>
+                <Input.Root>
+                  <Input.Wrapper>
+                    <Input.Icon>
+                      <Lock />
+                    </Input.Icon>
+                    <Input.Input
+                      id="password"
+                      type="password"
+                      name="password"
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                      disabled={isLoading}
                       required
                     />
                   </Input.Wrapper>
@@ -221,6 +277,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                   id="terms"
                   checked={agreedToTerms}
                   onCheckedChange={(checked: boolean | "indeterminate") => setAgreedToTerms(checked === true)}
+                  disabled={isLoading}
                 />
                 <Label htmlFor="terms" className="cursor-pointer text-paragraph-sm leading-relaxed">
                   I agree to the{" "}
@@ -241,9 +298,9 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                 size="medium"
                 type="submit"
                 className="w-full"
-                disabled={!agreedToTerms || !email}
+                disabled={!agreedToTerms || !email || !password || isLoading}
               >
-                Get Started
+                {isLoading ? "Signing in..." : "Get Started"}
               </Button>
             </form>
 

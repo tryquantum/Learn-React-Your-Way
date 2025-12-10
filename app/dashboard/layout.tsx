@@ -11,6 +11,7 @@ import {
   RiSparklingLine,
   RiSettings3Line,
   RiMenuLine,
+  RiChat3Line,
 } from '@remixicon/react';
 
 export default function DashboardLayout({
@@ -73,6 +74,13 @@ export default function DashboardLayout({
       icon: <RiSparklingLine className="w-5 h-5" />,
       onClick: () => router.push('/dashboard/ai-generator'),
       isActive: pathname === '/dashboard/ai-generator',
+    },
+    {
+      id: 'ai-assistant',
+      title: 'AI Assistant',
+      icon: <RiChat3Line className="w-5 h-5" />,
+      onClick: () => router.push('/dashboard/ai-assistant'),
+      isActive: pathname === '/dashboard/ai-assistant',
     },
     {
       id: 'settings',

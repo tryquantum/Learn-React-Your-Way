@@ -8,6 +8,7 @@ import { Provider as TooltipProvider } from '@/components/ui/tooltip';
 import { NotificationProvider } from '@/components/ui/notification-provider';
 import { DevToolbarInit } from '@/components/dev-toolbar';
 import { GoogleAnalytics } from '@/components/GoogleAnalytics';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 export const metadata: Metadata = {
   title: 'Growtiva - AI Marketing Team for Solopreneurs',
@@ -92,16 +93,18 @@ export default function RootLayout({
       className={cn(GeistSans.variable, GeistMono.variable, 'antialiased')}
     >
       <body className='bg-bg-white-0 text-text-strong-950'>
-        <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-          <TooltipProvider>
-            <div className='flex min-h-screen flex-col'>
-              <main className='flex flex-1 flex-col'>{children}</main>
-            </div>
-          </TooltipProvider>
-        </ThemeProvider>
-        <NotificationProvider />
-        <DevToolbarInit />
-        <GoogleAnalytics />
+        <AuthProvider>
+          <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+            <TooltipProvider>
+              <div className='flex min-h-screen flex-col'>
+                <main className='flex flex-1 flex-col'>{children}</main>
+              </div>
+            </TooltipProvider>
+          </ThemeProvider>
+          <NotificationProvider />
+          <DevToolbarInit />
+          <GoogleAnalytics />
+        </AuthProvider>
       </body>
     </html>
   );

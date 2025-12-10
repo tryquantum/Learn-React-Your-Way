@@ -1,137 +1,211 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import * as Button from '@/components/ui/button';
-import * as Alert from '@/components/ui/alert';
-import * as Badge from '@/components/ui/badge';
-import { RiMailLine, RiArrowLeftLine, RiErrorWarningLine, RiCheckboxCircleLine } from '@remixicon/react';
+import { AuthLayout } from '@/components/layouts/AuthLayout';
+import { OTPInput } from '@/components/ui/otp-input';
+import { useNotification } from '@/hooks/use-notification';
+import { verificationService } from '@/lib/xano';
+import { Mail, CheckCircle2, RefreshCw } from 'lucide-react';
+import { Root as Button } from '@/components/ui/button';
 
 export default function VerifyEmailPage() {
   const router = useRouter();
-  const search = useSearchParams();
-  const emailFromQuery = search.get('email') ?? '';
-  const token = search.get('token');
-  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [message, setMessage] = useState<string | null>(null);
-  const [cooldown, setCooldown] = useState(0);
-  const [sending, setSending] = useState(false);
+  const searchParams = useSearchParams();
+  const { notification } = useNotification();
+  
+  const email = searchParams?.get('email') || '';
+  const [otp, setOtp] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+  const [canResend, setCanResend] = useState(false);
+  const [countdown, setCountdown] = useState(60);
 
-  const maskedEmail = useMemo(() => {
-    if (!emailFromQuery) return 'your email';
-    const [user, domain] = emailFromQuery.split('@');
-    if (!domain) return emailFromQuery;
-    const safeUser = user.length <= 2 ? `${user[0] ?? ''}*` : `${user[0]}***${user[user.length - 1]}`;
-    return `${safeUser}@${domain}`;
-  }, [emailFromQuery]);
-
+  // Countdown timer for resend
   useEffect(() => {
-    if (!token) return;
-    const verify = async () => {
-      try {
-        const res = await fetch(`/api/auth/verify-email?token=${token}`);
-        const data = await res.json();
-        if (res.ok) {
-          setStatus('success');
-          setMessage('Email verified successfully.');
-          setTimeout(() => {
-            router.push('/verify-success');
-          }, 1500);
-        } else {
-          setStatus('error');
-          setMessage(data?.message || 'Verification failed.');
-        }
-      } catch {
-        setStatus('error');
-        setMessage('Network error. Please try again.');
-      }
-    };
-    verify();
-  }, [router, token]);
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setCanResend(true);
+    }
+  }, [countdown]);
 
+  // Auto-verify when OTP is complete
   useEffect(() => {
-    if (cooldown <= 0) return;
-    const interval = setInterval(() => setCooldown((c) => Math.max(0, c - 1)), 1000);
-    return () => clearInterval(interval);
-  }, [cooldown]);
+    if (otp.length === 6 && !isVerifying) {
+      handleVerify();
+    }
+  }, [otp]);
 
-  const handleResend = async () => {
-    if (!emailFromQuery || cooldown > 0) return;
-    setSending(true);
-    setMessage(null);
+  const handleVerify = async () => {
+    if (otp.length !== 6) return;
+
+    setIsVerifying(true);
+
     try {
-      const res = await fetch('/api/auth/resend-verification-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: emailFromQuery }),
+      // Convert OTP string to integer for Xano API
+      const tokenInt = parseInt(otp, 10);
+      
+      const response = await verificationService.verifyEmail({
+        email,
+        token: tokenInt,
       });
-      const data = await res.json();
-      if (res.ok) {
-        setStatus('success');
-        setMessage('Verification email sent.');
-        setCooldown(60);
-      } else {
-        setStatus('error');
-        setMessage(data?.message || 'Failed to resend. Try again.');
+
+      if (response.success) {
+        setIsVerified(true);
+        
+        notification({
+          status: 'success',
+          title: 'Email verified!',
+          description: 'Your account is now active. Please login to continue.',
+          duration: 4000,
+        });
+
+        // Redirect to login page (user needs to login after verification)
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
       }
-    } catch {
-      setStatus('error');
-      setMessage('Network error. Please try again.');
-    } finally {
-      setSending(false);
+    } catch (err: any) {
+      console.error('Verification error:', err);
+      
+      const errorMessage = err.message || 'Invalid code. Please try again.';
+      
+      notification({
+        status: 'error',
+        title: 'Verification failed',
+        description: errorMessage,
+        duration: 5000,
+      });
+
+      // Clear OTP on error
+      setOtp('');
+      setIsVerifying(false);
     }
   };
 
+  const handleResendOTP = async () => {
+    if (!canResend || isResending) return;
+
+    setIsResending(true);
+
+    try {
+      const response = await verificationService.resendOTP({ email });
+
+      notification({
+        status: 'success',
+        title: 'Code sent!',
+        description: response.message || 'A new verification code has been sent to your email.',
+        duration: 5000,
+      });
+
+      // Reset countdown
+      setCountdown(60);
+      setCanResend(false);
+    } catch (err: any) {
+      console.error('Resend error:', err);
+      
+      notification({
+        status: 'error',
+        title: 'Failed to resend',
+        description: err.message || 'Could not resend code. Please try again.',
+        duration: 5000,
+      });
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  const handleClose = () => {
+    router.push('/login');
+  };
+
   return (
-    <div className='flex min-h-screen items-center justify-center bg-gradient-to-b from-bg-weak-50 to-bg-white-0 px-4 py-12'>
-      <div className='w-full max-w-md rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-8 shadow-custom-md'>
-        <div className='mb-6 flex flex-col items-center gap-3 text-center'>
-          <div className='flex size-12 items-center justify-center rounded-full bg-primary-alpha-10 text-primary-base'>
-            <RiMailLine className='size-6' />
-          </div>
-          <h1 className='text-title-h4 text-text-strong-950'>Check your email</h1>
-          <p className='text-paragraph-md text-text-sub-600'>
-            We sent a verification link to <span className='font-semibold text-text-strong-950'>{maskedEmail}</span>
+    <AuthLayout onClose={handleClose}>
+      <div className="w-full max-w-md mx-auto">
+        {/* Icon */}
+        <div className={`w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center ${
+          isVerified ? 'bg-success-alpha-10' : 'bg-primary-alpha-10'
+        }`}>
+          {isVerified ? (
+            <CheckCircle2 className="w-8 h-8 text-success-base" />
+          ) : (
+            <Mail className="w-8 h-8 text-primary-base" />
+          )}
+        </div>
+
+        {/* Title */}
+        <h1 className="text-2xl sm:text-3xl font-bold text-text-strong-950 text-center mb-3">
+          {isVerified ? 'Email Verified!' : 'Verify Your Email'}
+        </h1>
+
+        {/* Description */}
+        {!isVerified && (
+          <p className="text-text-soft-400 text-center mb-8">
+            We sent a 6-digit code to <br />
+            <span className="font-medium text-text-sub-600">{email || 'your email'}</span>
           </p>
-          <Badge.Root variant='lighter' color='green'>
-            <Badge.Dot />
-            Link expires in 24 hours
-          </Badge.Root>
-        </div>
+        )}
 
-        {message ? (
-          <Alert.Root variant='light' status={status === 'error' ? 'error' : 'success'} size='small' className='mb-4'>
-            <Alert.Icon as={status === 'error' ? RiErrorWarningLine : RiCheckboxCircleLine} />
-            <div>{message}</div>
-          </Alert.Root>
-        ) : null}
+        {isVerified ? (
+          /* Success message */
+          <div className="text-center py-8">
+            <p className="text-text-sub-600 mb-4">
+              Your account is now active!
+            </p>
+            <div className="animate-pulse text-text-soft-400 text-sm">
+              Redirecting to login...
+            </div>
+          </div>
+        ) : (
+          /* OTP Input */
+          <>
+            <div className="mb-8">
+              <OTPInput
+                length={6}
+                value={otp}
+                onChange={setOtp}
+                disabled={isVerifying}
+                autoFocus
+              />
+            </div>
 
-        <div className='space-y-3'>
-          <Button.Root className='w-full' onClick={handleResend} disabled={sending || cooldown > 0}>
-            {cooldown > 0 ? `Resend in ${cooldown}s` : sending ? 'Sending...' : 'Resend verification email'}
-          </Button.Root>
-          <details className='rounded-xl border border-stroke-soft-200 bg-bg-weak-50 px-4 py-3 text-paragraph-sm text-text-sub-600'>
-            <summary className='cursor-pointer font-semibold text-text-strong-950'>Didn&apos;t receive the email?</summary>
-            <ul className='mt-2 list-disc space-y-1 pl-5'>
-              <li>Check your spam or junk folder</li>
-              <li>Verify the email address is correct</li>
-              <li>Resend the verification email above</li>
-              <li>
-                Contact{' '}
-                <a href='mailto:support@growtiva.com' className='text-primary-base underline'>
-                  support@growtiva.com
-                </a>
-              </li>
-            </ul>
-          </details>
-          <Button.Root variant='neutral' mode='ghost' asChild>
-            <a href='/login' className='inline-flex items-center justify-center gap-2'>
-              <RiArrowLeftLine className='size-4' />
-              Back to login
-            </a>
-          </Button.Root>
-        </div>
+            {/* Resend button */}
+            <div className="text-center">
+              <p className="text-sm text-text-soft-400 mb-3">
+                Didn't receive the code?
+              </p>
+              
+              <Button
+                mode="ghost"
+                onClick={handleResendOTP}
+                disabled={!canResend || isResending}
+                className="mx-auto"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isResending ? 'animate-spin' : ''}`} />
+                {isResending 
+                  ? 'Sending...' 
+                  : canResend 
+                  ? 'Resend Code' 
+                  : `Resend in ${countdown}s`
+                }
+              </Button>
+            </div>
+
+            {/* Back to login */}
+            <div className="text-center mt-8 pt-6 border-t border-stroke-soft-200">
+              <button
+                onClick={() => router.push('/login')}
+                className="text-sm text-text-soft-400 hover:text-text-sub-600 transition-colors"
+              >
+                Back to login
+              </button>
+            </div>
+          </>
+        )}
       </div>
-    </div>
+    </AuthLayout>
   );
 }
