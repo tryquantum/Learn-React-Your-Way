@@ -1,9 +1,8 @@
 import { OnboardingState, OnboardingStep } from './types';
-import { xanoPost, xanoGet } from '../xano/client';
 
 export interface OnboardingApiResponse {
   success: boolean;
-  data: any;
+  data: Record<string, unknown>;
   message?: string;
   next_step?: OnboardingStep;
 }
@@ -43,7 +42,7 @@ export async function getOnboardingState(): Promise<OnboardingState> {
 /**
  * Save selected niche
  */
-export async function saveNiche(niche: string): Promise<OnboardingApiResponse> {
+export async function saveNiche(_niche: string): Promise<OnboardingApiResponse> {
   // Mock API call
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -61,7 +60,7 @@ export async function saveNiche(niche: string): Promise<OnboardingApiResponse> {
 /**
  * Save business name and create workspace
  */
-export async function saveWorkspace(businessName: string): Promise<OnboardingApiResponse> {
+export async function saveWorkspace(_businessName: string): Promise<OnboardingApiResponse> {
   // Mock API call
   return new Promise((resolve) => {
     setTimeout(() => {

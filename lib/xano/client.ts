@@ -23,7 +23,7 @@ export interface XanoRequestOptions extends RequestInit {
 /**
  * Make a request to the Xano API
  */
-export async function xanoFetch<T = any>(
+export async function xanoFetch<T = unknown>(
   endpoint: string,
   options: XanoRequestOptions = {}
 ): Promise<T> {
@@ -72,7 +72,7 @@ export async function xanoFetch<T = any>(
     }
 
     return data;
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof XanoError) {
       throw error;
     }
@@ -87,7 +87,7 @@ export async function xanoFetch<T = any>(
 /**
  * Helper for GET requests
  */
-export async function xanoGet<T = any>(
+export async function xanoGet<T = unknown>(
   endpoint: string,
   options?: XanoRequestOptions
 ): Promise<T> {
@@ -97,9 +97,9 @@ export async function xanoGet<T = any>(
 /**
  * Helper for POST requests
  */
-export async function xanoPost<T = any>(
+export async function xanoPost<T = unknown>(
   endpoint: string,
-  body?: any,
+  body?: Record<string, unknown>,
   options?: XanoRequestOptions
 ): Promise<T> {
   return xanoFetch<T>(endpoint, {
@@ -112,9 +112,9 @@ export async function xanoPost<T = any>(
 /**
  * Helper for PUT requests
  */
-export async function xanoPut<T = any>(
+export async function xanoPut<T = unknown>(
   endpoint: string,
-  body?: any,
+  body?: Record<string, unknown>,
   options?: XanoRequestOptions
 ): Promise<T> {
   return xanoFetch<T>(endpoint, {
@@ -127,7 +127,7 @@ export async function xanoPut<T = any>(
 /**
  * Helper for DELETE requests
  */
-export async function xanoDelete<T = any>(
+export async function xanoDelete<T = unknown>(
   endpoint: string,
   options?: XanoRequestOptions
 ): Promise<T> {

@@ -3,7 +3,7 @@
 import React, { ReactNode, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search, Bell, ChevronDown, LogOut, Settings as SettingsIcon, User } from 'lucide-react';
+import { Search, Bell, ChevronDown, LogOut, Settings as SettingsIcon } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { UserTier } from '@/lib/dashboard/types';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,7 +28,7 @@ export function DashboardLayout({
   workspace,
   notificationCount = 0 
 }: DashboardLayoutProps) {
-  const router = useRouter();
+  useRouter(); // Used for navigation on logout
   const { logout } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 

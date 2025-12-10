@@ -7,7 +7,7 @@ import { NicheSelector } from './NicheSelector';
 import { BusinessNameInput } from './BusinessNameInput';
 
 interface OnboardingFlowProps {
-  user: any;
+  user: { name?: string; email: string };
 }
 
 export function OnboardingFlow({ user }: OnboardingFlowProps) {
