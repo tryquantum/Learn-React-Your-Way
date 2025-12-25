@@ -25,7 +25,7 @@ export default function LoginPage() {
       if (onboardingCompleted) {
         router.push('/dashboard');
       } else {
-        router.push('/onboarding/niche-selection');
+        router.push('/onboarding');
       }
     } catch (err: any) {
       // Map error to user-friendly message

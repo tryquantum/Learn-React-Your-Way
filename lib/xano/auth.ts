@@ -30,21 +30,47 @@ export interface SignupResponse {
  * Login with email and password
  * Returns full auth response including onboarding status
  */
+// Fix lint error by casting
 export async function login(credentials: LoginCredentials): Promise<AuthResponse> {
-  const response = await xanoPost<AuthResponse>('/auth/login', credentials);
+  const response = await xanoPost<any>('/auth/login', credentials as unknown as Record<string, unknown>);
   
-  // Store auth token
-  setAuthToken(response.authToken);
-  
-  // Store user data
-  setStoredUser(response.user);
-  
-  // Store workspace if available
-  if (response.workspace) {
-    setStoredWorkspace(response.workspace);
+  // Robustly handle potential string types from Xano
+  let parsedUser = typeof response.user === 'string' 
+    ? JSON.parse(response.user) 
+    : response.user;
+    
+  // Construct 'name' field if missing (Xano uses first_name)
+  if (!parsedUser.name && parsedUser.first_name) {
+    parsedUser.name = parsedUser.first_name;
   }
   
-  return response;
+  const safeResponse: AuthResponse = {
+    ...response,
+    // Ensure boolean
+    onboardingCompleted: typeof response.onboardingCompleted === 'string' 
+      ? response.onboardingCompleted === 'true' 
+      : !!response.onboardingCompleted,
+      
+    // Use parsed and fixed user object
+    user: parsedUser
+  };
+  
+  // Store auth token
+  if (safeResponse.authToken) {
+    setAuthToken(safeResponse.authToken);
+  } else {
+    console.error('Login successful but no authToken returned', response);
+  }
+  
+  // Store user data
+  setStoredUser(safeResponse.user);
+  
+  // Store workspace if available
+  if (safeResponse.workspace) {
+    setStoredWorkspace(safeResponse.workspace);
+  }
+  
+  return safeResponse;
 }
 
 /**
@@ -52,8 +78,15 @@ export async function login(credentials: LoginCredentials): Promise<AuthResponse
  * Sends email verification, does NOT auto-login
  */
 export async function signup(data: SignupData): Promise<SignupResponse> {
-  const response = await xanoPost<SignupResponse>('/auth/signup', data);
-  return response;
+  const response = await xanoPost<any>('/auth/signup', data as unknown as Record<string, unknown>);
+  
+  return {
+    ...response,
+    // Ensure boolean
+    success: typeof response.success === 'string' 
+      ? response.success === 'true' 
+      : !!response.success
+  };
 }
 
 /**

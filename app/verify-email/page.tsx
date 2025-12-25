@@ -59,13 +59,13 @@ export default function VerifyEmailPage() {
         notification({
           status: 'success',
           title: 'Email verified!',
-          description: 'Your account is now active. Please login to continue.',
+          description: 'Your account is now active. Taking you to onboarding...',
           duration: 4000,
         });
 
-        // Redirect to login page (user needs to login after verification)
+        // Redirect to onboarding page
         setTimeout(() => {
-          router.push('/login');
+          router.push('/onboarding');
         }, 2000);
       }
     } catch (err: any) {
@@ -119,7 +119,7 @@ export default function VerifyEmailPage() {
   };
 
   const handleClose = () => {
-    router.push('/login');
+    router.push('/onboarding');
   };
 
   return (
@@ -156,7 +156,7 @@ export default function VerifyEmailPage() {
               Your account is now active!
             </p>
             <div className="animate-pulse text-text-soft-400 text-sm">
-              Redirecting to login...
+              Redirecting to onboarding...
             </div>
           </div>
         ) : (
@@ -197,10 +197,10 @@ export default function VerifyEmailPage() {
             {/* Back to login */}
             <div className="text-center mt-8 pt-6 border-t border-stroke-soft-200">
               <button
-                onClick={() => router.push('/login')}
+                onClick={() => router.push('/onboarding')}
                 className="text-sm text-text-soft-400 hover:text-text-sub-600 transition-colors"
               >
-                Back to login
+                Continue to onboarding
               </button>
             </div>
           </>

@@ -1,14 +1,34 @@
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';
-import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Hand } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { DashboardGrid } from '@/components/dashboard/DashboardGrid';
+import { ProgressCard } from '@/components/dashboard/widgets/ProgressCard';
+import { RecentContentCard } from '@/components/dashboard/widgets/RecentContentCard';
+import { SavedContentCard } from '@/components/dashboard/widgets/SavedContentCard';
+import { QuickActionsCard } from '@/components/dashboard/widgets/QuickActionsCard';
+import { AIAssistantWidget } from '@/components/dashboard/widgets/AIAssistantWidget';
+import { CelebrationBanner } from '@/components/dashboard/widgets/CelebrationBanner';
+import { DemoContentCard } from '@/components/dashboard/widgets/DemoContentCard';
+import { BusinessContextCard } from '@/components/dashboard/widgets/BusinessContextCard';
+import { InsightsCard } from '@/components/dashboard/widgets/InsightsCard';
+import { GoalsCard } from '@/components/dashboard/widgets/GoalsCard';
+import dynamic from 'next/dynamic';
+
+// Import DashboardLayout removed as we use the main layout
+// Widgets are imported below
+
 
 export default function DashboardHomePage() {
   const { user, workspace, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -16,6 +36,11 @@ export default function DashboardHomePage() {
       router.push('/login');
     }
   }, [isLoading, isAuthenticated, router]);
+
+  // Prevent hydration mismatch
+  if (!isMounted) {
+    return null;
+  }
 
   // Show loading while checking auth
   if (isLoading) {
@@ -30,57 +55,50 @@ export default function DashboardHomePage() {
   }
 
   // Don't render anything while redirecting
-  if (!isAuthenticated || !user || !workspace) {
-    return null;
-  }
+  if (!isAuthenticated) return null;
+  
+  // Use mock workspace if missing (as per user request since API isn't ready)
+  const currentWorkspace = workspace || {
+    name: "My Business",
+    subscription_tier: "free"
+  };
+  
+  // Ensure we have at least a user object (should be guaranteed by isAuthenticated)
+  if (!user) return null;
 
-  // Temporary placeholder - will be replaced with actual dashboard content
   return (
-    <DashboardLayout
-      user={{
-        first_name: user.name.split(' ')[0] || user.name,
-        last_name: user.name.split(' ').slice(1).join(' ') || '',
-        email: user.email,
-        tier: workspace?.subscription_tier === 'free' ? 'FREE' : 'PRO'
-      }}
-      workspace={{
-        name: workspace.name
-      }}
-      notificationCount={0}
-    >
-      {/* Temporary welcome message */}
-      <div className="h-full flex items-center justify-center">
-        <div className="text-center max-w-2xl">
-          <div className="w-20 h-20 bg-primary-alpha-10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Hand className="w-10 h-10 text-primary-base" />
-          </div>
-          <h1 className="text-3xl font-bold text-text-strong-950 mb-4">
-            Welcome to Growtiva, {user.name || user.email}! 👋
-          </h1>
-          <p className="text-text-soft-400 text-lg mb-8">
-            Your AI team is ready to help you create amazing content. <br />
-            Dashboard is being built...
-          </p>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12">
-            <div className="p-6 bg-bg-white-0 border border-stroke-soft-200 rounded-2xl">
-              <div className="text-2xl mb-2">✨</div>
-              <h3 className="font-semibold text-text-strong-950 mb-1">Generate Content</h3>
-              <p className="text-sm text-text-soft-400">Coming soon</p>
-            </div>
-            <div className="p-6 bg-bg-white-0 border border-stroke-soft-200 rounded-2xl">
-              <div className="text-2xl mb-2">📚</div>
-              <h3 className="font-semibold text-text-strong-950 mb-1">Content Vault</h3>
-              <p className="text-sm text-text-soft-400">Coming soon</p>
-            </div>
-            <div className="p-6 bg-bg-white-0 border border-stroke-soft-200 rounded-2xl">
-              <div className="text-2xl mb-2">📊</div>
-              <h3 className="font-semibold text-text-strong-950 mb-1">Analytics</h3>
-              <p className="text-sm text-text-soft-400">Coming soon</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </DashboardLayout>
+    <div className="max-w-[1400px] mx-auto h-full">
+      <h1 className="text-2xl font-bold text-text-strong-950 mb-6">
+        Welcome back, {(user.name || '').split(' ')[0] || user.name || 'User'}! 👋
+      </h1>
+      
+      <DashboardGrid
+        leftColumn={
+          <>
+            <ProgressCard />
+            <RecentContentCard />
+            <SavedContentCard />
+          </>
+        }
+        centerColumn={
+          <>
+            <QuickActionsCard />
+            <CelebrationBanner />
+            <DemoContentCard />
+            <AIAssistantWidget />
+          </>
+        }
+        rightColumn={
+          <>
+            <BusinessContextCard 
+              businessName={currentWorkspace.name || "Your Business"} 
+              // In a real app, description and industry would come from user metadata or separate API call
+            />
+            <InsightsCard />
+            <GoalsCard />
+          </>
+        }
+      />
+    </div>
   );
 }

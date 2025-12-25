@@ -13,7 +13,8 @@ export function mapErrorToMessage(error: string): string {
     'Too many login attempts': 'Too many login attempts. Please try again later.',
   };
 
-  return errorMap[error] || 'An error occurred. Please try again.';
+  // Return raw error if no mapping found (for debugging)
+  return errorMap[error] || error;
 }
 
 /**

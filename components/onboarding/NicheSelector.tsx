@@ -15,6 +15,12 @@ const NICHE_OPTIONS: NicheOption[] = [
     description: 'Personal training & wellness'
   },
   {
+    id: 'beauty',
+    label: 'Beauty & Wellness',
+    icon: '💄',
+    description: 'Salons, spas & aesthetics'
+  },
+  {
     id: 'real-estate',
     label: 'Real Estate',
     icon: '🏠',
@@ -63,7 +69,7 @@ export function NicheSelector({ onSelect, disabled }: NicheSelectorProps) {
   return (
     <div className="w-full">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {NICHE_OPTIONS.slice(0, 4).map((niche) => (
+        {NICHE_OPTIONS.map((niche) => (
           <NicheCard
             key={niche.id}
             niche={niche}

@@ -5,15 +5,20 @@ import { AIMessage, UserMessage } from './ui/MessageBubble';
 interface ConversationContainerProps {
   messages: Message[];
   isTyping?: boolean;
+  activeComponent?: React.ReactNode;
 }
 
-export function ConversationContainer({ messages, isTyping }: ConversationContainerProps) {
+export function ConversationContainer({ messages, isTyping, activeComponent }: ConversationContainerProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when messages change
+  // Auto-scroll to bottom when messages or active component changes
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isTyping]);
+    // Small delay to ensure content is rendered
+    const timer = setTimeout(() => {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [messages, isTyping, activeComponent]);
 
   return (
     <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
@@ -40,6 +45,13 @@ export function ConversationContainer({ messages, isTyping }: ConversationContai
                 <span className="w-1.5 h-1.5 bg-text-soft-400 rounded-full animate-bounce"></span>
               </div>
             </div>
+          </div>
+        )}
+        
+        {/* Active interactive component (rendered in-stream) */}
+        {activeComponent && (
+          <div className="mt-4 mb-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {activeComponent}
           </div>
         )}
         

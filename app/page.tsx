@@ -1,4 +1,3 @@
-import { AnnouncementBanner } from '@/components/AnnouncementBanner';
 import { BrandShowcase } from '@/components/BrandShowcase';
 import { HeroSection } from '@/components/HeroSection';
 import { NavigationHeader } from '@/components/NavigationHeader';
@@ -14,7 +13,6 @@ import { Footer } from '@/components/Footer';
 export default function Home() {
   return (
     <div className='flex flex-1 flex-col bg-bg-white-0 text-text-strong-950'>
-      <AnnouncementBanner />
       <NavigationHeader />
       <main className='flex flex-1 flex-col'>
         <HeroSection />

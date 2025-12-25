@@ -92,7 +92,7 @@ export default function DashboardLayout({
   ];
 
   return (
-    <div className="flex min-h-screen bg-[color:var(--bg-weak-50)] dark:bg-[color:var(--bg-strong-950)]">
+    <div suppressHydrationWarning className="flex min-h-screen bg-[color:var(--bg-weak-50)] dark:bg-[color:var(--bg-strong-950)]">
       {/* Mobile Menu Button */}
       <button
         onClick={handleMobileToggle}
